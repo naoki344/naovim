@@ -1,12 +1,16 @@
-repo = 'Shougo/deoplete.nvim'
-hook_add = 'let g:deoplete#enable_at_startup = 1'
+#[[plugins]]
+#repo = 'Shougo/deoplete.nvim'
+#hook_add = 'let g:deoplete#enable_at_startup = 1'
+
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
 [[plugins]]
 repo = 'rhysd/nyaovim-markdown-preview'
 [[plugins]]
 repo = 'yaasita/ore_markdown'
 [[plugins]]
 repo = 'mattn/emmet-vim'
-
 
 # make git convinient
 [[plugins]]
@@ -81,11 +85,6 @@ repo = 'w0rp/ale'
 repo = 'scrooloose/nerdtree'
 
 [[plugins]]
-repo = 'Shougo/deoplete.nvim'
-hook_add = 'let g:deoplete#enable_at_startup = 1'
-[[plugins]]
-repo = 'Shougo/dein.vim'
-[[plugins]]
 repo = 'Shougo/context_filetype.vim'
 [[plugins]]
 repo = 'kana/vim-textobj-user'
@@ -110,4 +109,3 @@ hook_post_update = '''
 '''
 [[plugins]]
 repo = 'cespare/vim-toml'
-
