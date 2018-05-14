@@ -27,9 +27,11 @@ inoremap <Down> <Nop>
 inoremap <Left> <Nop>
 inoremap <Right> <Nop>
 inoremap fd <Esc>
-"nnoremap <silent><C-e> :NERDTreeToggle<CR>
-map <C-n> :NERDTreeToggle<CR>
-map pq :q<CR>:q<CR>
+noremap pq :q<CR>:q<CR>
+noremap <C-n> :NERDTreeToggle<CR>
+noremap <leader>gw :Gwrite<CR>
+noremap <leader>gc :Gcommit<CR> 
+noremap <leader>gs :Gstatus<CR>
 
 " プラグインがインストールされるディレクトリ
 let s:dein_dir = expand('~/.cache/dein')
