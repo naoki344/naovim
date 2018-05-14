@@ -29,6 +29,7 @@ inoremap <Right> <Nop>
 inoremap fd <Esc>
 "nnoremap <silent><C-e> :NERDTreeToggle<CR>
 map <C-n> :NERDTreeToggle<CR>
+map pq :q<CR>:q<CR>
 
 " プラグインがインストールされるディレクトリ
 let s:dein_dir = expand('~/.cache/dein')
@@ -93,7 +94,6 @@ autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 
 "https://kamiya555.github.io/2015/10/14/nerdtree-command/
-
 autocmd vimenter * NERDTree
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
