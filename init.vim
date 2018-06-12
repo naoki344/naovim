@@ -27,7 +27,7 @@ inoremap <Down> <Nop>
 inoremap <Left> <Nop>
 inoremap <Right> <Nop>
 inoremap fd <Esc>
-noremap pq :q<CR>:q<CR>
+noremap <space>v :q<CR>
 noremap <C-n> :NERDTreeToggle<CR>
 noremap <leader>gw :Gwrite<CR>
 noremap <leader>gc :Gcommit<CR> 
@@ -85,8 +85,11 @@ highlight Normal ctermbg=none
 "///////////////////////nerdtree/////////////////////////
 " nerdtree が提示するファイルの順番を OSX と同じにしたい
 let NERDTreeSortOrder = [ '*', '^..*' ]
-" au VimEnter * NERDTreeToggle /Users/wakita/Dropbox
-let NERDTreeBookmarksFile=$DROPBOX . '/lib/vim/miyoshi_naoki/nerdtree-bookmarks'
+" Bookmarkファイルを指定する
+let NERDTreeBookmarksFile= $HOME."/nerdtree-bookmarks.vim"
+
+" ブックマークを最初から表示
+let g:NERDTreeShowBookmarks=1
 
 "https://kamiya555.github.io/2015/10/14/nerdtree-command/
 
@@ -99,6 +102,9 @@ autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 autocmd vimenter * NERDTree
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+"他のバッファをすべて閉じた時にNERDTreeが開いていたらNERDTreeも一緒に閉じる。
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 "///////////////////////nerdtree/////////////////////////
 
