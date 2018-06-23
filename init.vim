@@ -130,3 +130,7 @@ if has("syntax")
         autocmd BufNew,BufRead * call ActivateInvisibleIndicator()
     augroup END
 endif
+
+
+" vue.jsファイルのシンタックスハイライトを調整するため
+autocmd FileType vue syntax sync fromstart
