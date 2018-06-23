@@ -6,13 +6,6 @@ hook_add = 'let g:deoplete#enable_at_startup = 1'
 [[plugins]]
 repo = 'Shougo/dein.vim'
 
-[[plugins]]
-repo = 'rhysd/nyaovim-markdown-preview'
-[[plugins]]
-repo = 'yaasita/ore_markdown'
-[[plugins]]
-repo = 'mattn/emmet-vim'
-
 # make git convinient
 [[plugins]]
 repo = 'tpope/vim-fugitive'
@@ -114,3 +107,4 @@ repo = 'cespare/vim-toml'
 
 [[plugins]]
 repo = 'sheerun/vim-polyglot'
+
