@@ -14,9 +14,13 @@ inoremap <silent> kk <ESC>
 inoremap <silent> <C-k> k
 
 filetype indent on
-set tabstop=2
-set shiftwidth=2
-set expandtab
+set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
+" タブを表示するときの幅
+set tabstop=4
+" タブを挿入するときの幅
+set shiftwidth=4
+" タブをタブとして扱う(スペースに展開しない)
+set noexpandtab
 
 noremap <Up> <Nop>
 noremap <Down> <Nop>
@@ -134,3 +138,16 @@ endif
 
 " vue.jsファイルのシンタックスハイライトを調整するため
 autocmd FileType vue syntax sync fromstart
+
+" Load settings for each location.
+augroup vimrc-local
+  autocmd!
+  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand(':p:h'))
+augroup END
+
+function! s:vimrc_local(loc)
+  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  for i in reverse(filter(files, 'filereadable(v:val)'))
+    source `=i`
+  endfor
+endfunction
