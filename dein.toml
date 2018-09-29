@@ -108,3 +108,5 @@ repo = 'cespare/vim-toml'
 [[plugins]]
 repo = 'sheerun/vim-polyglot'
 
+[[plugins]]
+repo = 'Lokaltog/vim-powerline'
