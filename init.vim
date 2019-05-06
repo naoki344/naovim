@@ -64,7 +64,7 @@ if dein#load_state(s:dein_dir)
   call dein#load_toml(s:toml,      {'lazy': 0})
   call dein#load_toml(s:lazy_toml, {'lazy': 1})
   " color scheme
-  call dein#add('tomasr/molokai')
+  "call dein#add('tomasr/molokai')
 
   " 設定終了
   call dein#end()
@@ -94,13 +94,6 @@ let NERDTreeBookmarksFile= $HOME."/nerdtree-bookmarks.vim"
 
 " ブックマークを最初から表示
 let g:NERDTreeShowBookmarks=1
-
-"https://kamiya555.github.io/2015/10/14/nerdtree-command/
-
-autocmd vimenter * NERDTree
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
 
 "https://kamiya555.github.io/2015/10/14/nerdtree-command/
 autocmd vimenter * NERDTree
@@ -136,18 +129,53 @@ if has("syntax")
 endif
 
 
-" vue.jsファイルのシンタックスハイライトを調整するため
-autocmd FileType vue syntax sync fromstart
+"" vue.jsファイルのシンタックスハイライトを調整するため
+"autocmd FileType vue syntax sync fromstart
+"
+"" Load settings for each location.
+"augroup vimrc-local
+"  autocmd!
+"  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand(':p:h'))
+"augroup END
+"
+"function! s:vimrc_local(loc)
+"  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+"  for i in reverse(filter(files, 'filereadable(v:val)'))
+"    source `=i`
+"  endfor
+"endfunction
+function! ProfileCursorMove() abort
+  let profile_file = expand('~/log/vim-profile.log')
+  if filereadable(profile_file)
+    call delete(profile_file)
+  endif
 
-" Load settings for each location.
-augroup vimrc-local
-  autocmd!
-  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand(':p:h'))
-augroup END
+  normal! gg
+  normal! zR
 
-function! s:vimrc_local(loc)
-  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-  for i in reverse(filter(files, 'filereadable(v:val)'))
-    source `=i`
+  execute 'profile start ' . profile_file
+  profile func *
+  profile file *
+
+  augroup ProfileCursorMove
+    autocmd!
+    autocmd CursorHold <buffer> profile pause | q
+  augroup END
+
+  for i in range(100)
+    call feedkeys('j')
   endfor
 endfunction
+
+
+"augroup vimrc-filetype
+"  autocmd!
+"  " PHPだったらインデント幅が４で
+"  autocmd BufNewFile,BufRead *.php set filetype=php
+"  autocmd FileType php setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
+"
+"  " Rubyだったらインデント幅は2にしたい
+"  autocmd BufNewFile,BufRead *.rb set filetype=ruby
+"  autocmd BufNewFile,BufRead *.ruby set filetype=ruby
+"  autocmd FileType ruby setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
+"augroup END
