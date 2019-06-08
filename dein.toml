@@ -174,3 +174,5 @@ let g:dbext_default_profile_dev11 = 'type=SQLSRV:user=dev_ar:passwd=myzkmy01:hos
 let g:dbext_default_profile = 'dev11'
 '''
 
+[[plugins]]
+repo = "majutsushi/tagbar"
