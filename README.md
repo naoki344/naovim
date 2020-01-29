@@ -9,3 +9,9 @@
 - map L nextTab
 - map i LinkHints.activateMode
 - map I LinkHints.activateModeToOpenInNewTab
+
+
+
+:call coc#util#install()
+:CocInstall coc-python
+:CocInstall coc-json

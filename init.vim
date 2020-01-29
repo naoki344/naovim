@@ -32,38 +32,11 @@ inoremap <Left> <Nop>
 inoremap <Right> <Nop>
 inoremap fd <Esc>
 noremap <space>v :q<CR>
-noremap <C-n> :NERDTreeToggle<CR>
 noremap <leader>gw :Gwrite<CR>
 noremap <leader>gc :Gcommit<CR> 
 noremap <leader>gs :Gstatus<CR>
 nmap q :TagbarToggle<CR>
 
-
-"タグジャンプ関連
-nnoremap <C-]> g<C-]>
-set tags=.tags;~
-
-function! s:execute_ctags() abort
-  " 探すタグファイル名
-  let tag_name = '.tags'
-  " ディレクトリを遡り、タグファイルを探し、パス取得
-  let tags_path = findfile(tag_name, '.;')
-  " タグファイルパスが見つからなかった場合
-  if tags_path ==# ''
-    return
-  endif
-
-  " タグファイルのディレクトリパスを取得
-  " `:p:h`の部分は、:h filename-modifiersで確認
-  let tags_dirpath = fnamemodify(tags_path, ':p:h')
-  " 見つかったタグファイルのディレクトリに移動して、ctagsをバックグラウンド実行（エラー出力破棄）
-  execute 'silent !cd' tags_dirpath '&& ctags -R -f' tag_name '2> /dev/null &'
-endfunction
-
-augroup ctags
-  autocmd!
-  autocmd BufWritePost * call s:execute_ctags()
-augroup END
 
 
 " プラグインがインストールされるディレクトリ
@@ -115,25 +88,6 @@ syntax on
 highlight Normal ctermbg=none
 
 
-"///////////////////////nerdtree/////////////////////////
-" nerdtree が提示するファイルの順番を OSX と同じにしたい
-let NERDTreeSortOrder = [ '*', '^..*' ]
-" Bookmarkファイルを指定する
-let NERDTreeBookmarksFile= $HOME."/nerdtree-bookmarks.vim"
-
-" ブックマークを最初から表示
-let g:NERDTreeShowBookmarks=1
-
-"https://kamiya555.github.io/2015/10/14/nerdtree-command/
-autocmd vimenter * NERDTree
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-"他のバッファをすべて閉じた時にNERDTreeが開いていたらNERDTreeも一緒に閉じる。
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-"///////////////////////nerdtree/////////////////////////
-
 " 全角スペース・行末のスペース・タブの可視化
 if has("syntax")
     syntax on
@@ -158,21 +112,6 @@ if has("syntax")
 endif
 
 
-"" vue.jsファイルのシンタックスハイライトを調整するため
-"autocmd FileType vue syntax sync fromstart
-"
-"" Load settings for each location.
-"augroup vimrc-local
-"  autocmd!
-"  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand(':p:h'))
-"augroup END
-"
-"function! s:vimrc_local(loc)
-"  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
-"  for i in reverse(filter(files, 'filereadable(v:val)'))
-"    source `=i`
-"  endfor
-"endfunction
 function! ProfileCursorMove() abort
   let profile_file = expand('~/log/vim-profile.log')
   if filereadable(profile_file)
@@ -208,3 +147,27 @@ endfunction
 "  autocmd BufNewFile,BufRead *.ruby set filetype=ruby
 "  autocmd FileType ruby setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
 "augroup END
+if has('persistent_undo')
+  set undodir=~/.vim/undo
+  set undofile
+endif
+
+
+" coc 設定
+nmap <silent> <C-]> <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" :nmap <C-n> :Defx -auto-recursive-level=1 -ignored-files=node_modules,.*<CR>
+:nmap <C-n> :Defx -resume -toggle -winwidth=30 -split=vertical -direction=topleft -listed -ignored-files=__pycache__<CR>
+" autocmd bufenter * if (winnr("$") == 1 && defx#is_opened_tree() == 'true') | defx#do_action('quit') | endif
