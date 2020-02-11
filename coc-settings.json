@@ -1,0 +1,59 @@
+{
+    "suggest.timeout": 5000,
+    "coc.preferences.previewAutoClose": false,
+    "suggest.maxPreviewWidth": 100,
+    "suggest.snippetIndicator": " >>",
+    "suggest.maxCompleteItemCount": 40,
+    "diagnostic.enable": true,
+    "diagnostic.virtualText": true,
+    "diagnostic.virtualTextPrefix": " >> ",
+    "diagnostic.checkCurrentLine": true,
+    "signature.maxWindowHeight": 25,
+    "signature.preferShownAbove": false,
+    "signature.hideOnTextChange": false,
+    "coc.source.file.enable": false,
+    "coc.source.buffer.enable": false,
+    "languageserver": {
+        "bash": {
+            "command": "bash-language-server",
+            "args": [
+                "start"
+            ],
+            "filetypes": [
+                "sh"
+            ],
+            "ignoredRootPaths": [
+                "~"
+            ]
+        }
+    },
+    "python.pythonPath": "/Users/miyoshinaoki/.pyenv/versions/3.6.6/bin/python",
+    "coc.preferences.rootPatterns": [
+        ".vim",
+        ".git",
+        ".hg",
+        ".projections.json"
+    ],
+    "python.linting.enabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": false,
+    "python.linting.mypyArgs": [
+        "--ignore-missing-imports",
+        "--follow-imports=silent",
+        "--show-column-numbers"
+    ],
+    "python.linting.flake8Enabled": false,
+    "python.linting.lintOnSave": false,
+    "coc.preferences.formatOnSaveFiletypes": [
+        "xml",
+        ".xml",
+        "json",
+        ".json"
+    ],
+    "python.jediEnabled": false,
+    "codeLens.enable": true,
+    "coc.preferences.jumpCommand": "tabe",
+    "python.autoComplete.extraPaths": [
+        "${PYTHONPATH}"
+    ]
+}

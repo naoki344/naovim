@@ -169,5 +169,5 @@ function! s:show_documentation()
 endfunction
 
 " :nmap <C-n> :Defx -auto-recursive-level=1 -ignored-files=node_modules,.*<CR>
-:nmap <C-n> :Defx -resume -toggle -winwidth=30 -split=vertical -direction=topleft -listed -ignored-files=__pycache__<CR>
+:nmap <C-n> :Defx -resume -toggle -winwidth=30 -split=vertical -direction=topleft -listed -ignored-files=__pycache__,.mypy_cache,*.pyc<CR>
 " autocmd bufenter * if (winnr("$") == 1 && defx#is_opened_tree() == 'true') | defx#do_action('quit') | endif
