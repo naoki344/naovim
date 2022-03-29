@@ -11,6 +11,10 @@
 - map I LinkHints.activateModeToOpenInNewTab
 
 
+- brew install neovim
+- anyenv,nodenvをインストールする
+- ~/.config/nvim にこのリポジトリを保存しておく
+- pip3 install neovim
 
 :call coc#util#install()
 :CocInstall coc-python
