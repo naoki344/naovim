@@ -3,7 +3,7 @@
 ## インストール方法
 ### vimのインストール
 - brew install neovim
-- anyenv,nodenvをインストールする
+- anyenv,nodenv,npm,yarnをインストールする
 - ~/.config/nvim にこのリポジトリを保存しておく
 - pip3 install neovim
 ### cocの準備
