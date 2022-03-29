@@ -1,5 +1,18 @@
 # naovim
 
+## インストール方法
+
+- brew install neovim
+- anyenv,nodenvをインストールする
+- ~/.config/nvim にこのリポジトリを保存しておく
+- pip3 install neovim
+
+:call coc#util#install()
+:CocInstall coc-python
+:CocInstall coc-json
+
+
+
 ## Vimium chromeをvimらいくにする
 ### https://qiita.com/satoshi03/items/9fdfcd0e46e095ec68c1
 - Insert your preferred key mappings here.
@@ -11,11 +24,3 @@
 - map I LinkHints.activateModeToOpenInNewTab
 
 
-- brew install neovim
-- anyenv,nodenvをインストールする
-- ~/.config/nvim にこのリポジトリを保存しておく
-- pip3 install neovim
-
-:call coc#util#install()
-:CocInstall coc-python
-:CocInstall coc-json
