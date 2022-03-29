@@ -1,15 +1,15 @@
 # naovim
 
 ## インストール方法
-
+### vimのインストール
 - brew install neovim
 - anyenv,nodenvをインストールする
 - ~/.config/nvim にこのリポジトリを保存しておく
 - pip3 install neovim
-
-:call coc#util#install()
-:CocInstall coc-python
-:CocInstall coc-json
+### cocの準備
+- :call coc#util#install()
+- :CocInstall coc-python
+- :CocInstall coc-json
 
 
 
