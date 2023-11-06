@@ -171,3 +171,25 @@ endfunction
 " :nmap <C-n> :Defx -auto-recursive-level=1 -ignored-files=node_modules,.*<CR>
 :nmap <C-n> :Defx -resume -toggle -winwidth=30 -split=vertical -direction=topleft -listed -ignored-files=__pycache__,.mypy_cache,*.pyc<CR>
 " autocmd bufenter * if (winnr("$") == 1 && defx#is_opened_tree() == 'true') | defx#do_action('quit') | endif
+
+" 補完表示時のEnterで改行をしない
+inoremap <expr><CR>  pumvisible() ? "<C-y>" : "<CR>"
+
+set completeopt=menuone,noinsert
+inoremap <expr><C-n> pumvisible() ? "<Down>" : "<C-n>"
+inoremap <expr><C-p> pumvisible() ? "<Up>" : "<C-p>"
+
+"" coc.nvim
+""" <Tab>で候補をナビゲート
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+"" <Tab>で次、<S+Tab>で前
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"

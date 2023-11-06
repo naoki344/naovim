@@ -6,6 +6,7 @@
 - anyenv,nodenv,npm,yarnをインストールする
 - ~/.config/nvim にこのリポジトリを保存しておく
 - pip3 install neovim
+
 ### cocの準備
 - :call coc#util#install()
 - :CocInstall coc-python
@@ -24,3 +25,11 @@
 - map I LinkHints.activateModeToOpenInNewTab
 
 
+
+
+### GOの設定
+
+#### 以下をinstallする
+```
+go get -u golang.org/x/tools/cmd/gopls
+```

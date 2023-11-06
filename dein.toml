@@ -1,6 +1,6 @@
-[[plugins]]
-repo = 'Shougo/deoplete.nvim'
-hook_add = 'let g:deoplete#enable_at_startup = 1'
+# [[plugins]]
+# repo = 'Shougo/deoplete.nvim'
+# hook_add = 'let g:deoplete#enable_at_startup = 1'
 
 [[plugins]]
 repo = 'davidhalter/jedi-vim'
@@ -15,8 +15,8 @@ let g:jedi#rename_command = "<leader>r"
 let g:jedi#smart_auto_mappings = 1
 '''
 
-[[plugins]]
-repo = 'Shougo/neocomplete.vim'
+# [[plugins]]
+# repo = 'Shougo/neocomplete.vim'
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
@@ -150,6 +150,7 @@ repo = "rainglow/vim"
 
 [[plugins]]
 repo = "neoclide/coc.nvim"
+build = './install.sh nightly'
 
 # ------ FileExploler関連---------
 [[plugins]]
