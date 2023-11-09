@@ -13,6 +13,9 @@ inoremap <silent> <C-j> j
 inoremap <silent> kk <ESC>
 inoremap <silent> <C-k> k
 
+"コードジャンプ時に別タブを開く
+nnoremap <C-]> :tabedit <C-R>=expand("<cfile>")<CR><CR>
+
 filetype indent on
 set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
 " タブを表示するときの幅

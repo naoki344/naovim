@@ -1,22 +1,22 @@
-# [[plugins]]
-# repo = 'Shougo/deoplete.nvim'
-# hook_add = 'let g:deoplete#enable_at_startup = 1'
-
-[[plugins]]
-repo = 'davidhalter/jedi-vim'
-hook_add = '''
-let g:jedi#goto_command = "<leader>d"
-let g:jedi#goto_assignments_command = "<leader>g"
-let g:jedi#goto_definitions_command = ""
-let g:jedi#documentation_command = "K"
-let g:jedi#usages_command = "<leader>n"
-let g:jedi#completions_command = "<C-Space>"
-let g:jedi#rename_command = "<leader>r"
-let g:jedi#smart_auto_mappings = 1
-'''
-
-# [[plugins]]
-# repo = 'Shougo/neocomplete.vim'
+# # [[plugins]]
+# # repo = 'Shougo/deoplete.nvim'
+# # hook_add = 'let g:deoplete#enable_at_startup = 1'
+# 
+# # [[plugins]]
+# # repo = 'davidhalter/jedi-vim'
+# # hook_add = '''
+# # let g:jedi#goto_command = "<leader>d"
+# # let g:jedi#goto_assignments_command = "<leader>g"
+# # let g:jedi#goto_definitions_command = ""
+# # let g:jedi#documentation_command = "K"
+# # let g:jedi#usages_command = "<leader>n"
+# # let g:jedi#completions_command = "<C-Space>"
+# # let g:jedi#rename_command = "<leader>r"
+# # let g:jedi#smart_auto_mappings = 1
+# # '''
+# 
+# # [[plugins]]
+# # repo = 'Shougo/neocomplete.vim'
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
@@ -70,9 +70,6 @@ repo = 'tomasr/molokai'
 [[plugins]]
 repo = 'tpope/vim-fugitive'
 
-#[[plugins]]
-#repo = 'idanarye/vim-merginal'
-
 [[plugins]]
 repo = 'Shougo/context_filetype.vim'
 
@@ -85,38 +82,38 @@ let g:gitgutter_sign_removed = '✘'
 let g:gitgutter_max_signs = 500
 '''
 
-[[plugins]]
-repo = 'w0rp/ale'
-hook_add = '''
-let g:ale_sign_error = '☓'
-let g:ale_sign_warning = '⚠'
-
-" ロケーションリストの代わりにQuickFixを使用する
-let g:ale_set_loclist = 0
-let g:ale_set_quickfix = 1
-
-" エラーと警告の一覧を見るためにウィンドウを開いておきたい
-"let g:ale_open_list = 1
-" エラーと警告がなくなっても開いたままにする
-"let g:ale_keep_list_window_open = 1
-
-let g:ale_linters = {
-    \ 'python': ['python', 'flake8', 'pylint'],
-    \ 'php': ['phpcs'],
-    \ }
-
-" 各ツールをFixerとして登録
-" 'python': ['autopep8', 'yapf', 'isort'],
-let g:ale_fixers = {
-    \ 'python': [
-	\    {buffer, lines -> {'command': 'yapf $%t -i --style="{indent_dictionary_value=True}" && isort -sl %t;', 'read_temporary_file': 1}}
-	\ ],
-    \ }
-"let g:ale_fix_on_save = 1
-
-let g:ale_php_phpcs_standard = 'WordPress'
-"let g:ale_statusline_format = ['E%d', 'W%d', '']
-'''
+# [[plugins]]
+# repo = 'dense-analysis/ale'
+# hook_add = '''
+# let g:ale_sign_error = '☓'
+# let g:ale_sign_warning = '⚠'
+# 
+# " ロケーションリストの代わりにQuickFixを使用する
+# let g:ale_set_loclist = 0
+# let g:ale_set_quickfix = 1
+# 
+# " エラーと警告の一覧を見るためにウィンドウを開いておきたい
+# "let g:ale_open_list = 1
+# " エラーと警告がなくなっても開いたままにする
+# "let g:ale_keep_list_window_open = 1
+# 
+# let g:ale_linters = {
+#     \ 'python': ['python', 'flake8', 'pylint'],
+#     \ 'php': ['phpcs'],
+#     \ }
+# 
+# " 各ツールをFixerとして登録
+# " 'python': ['autopep8', 'yapf', 'isort'],
+# let g:ale_fixers = {
+#     \ 'python': [
+# 	\    {buffer, lines -> {'command': 'yapf $%t -i --style="{indent_dictionary_value=True}" && isort -sl %t;', 'read_temporary_file': 1}}
+# 	\ ],
+#     \ }
+# "let g:ale_fix_on_save = 1
+# 
+# let g:ale_php_phpcs_standard = 'WordPress'
+# "let g:ale_statusline_format = ['E%d', 'W%d', '']
+# '''
 
 [[plugins]]
 repo = 'cohama/agit.vim'
@@ -221,3 +218,13 @@ function! s:defx_my_settings() abort
 endfunction
 '''
 # ------ FileExploler関連---------
+
+[[plugins]]
+repo = 'github/copilot.vim'
+
+[[plugins]]
+repo = 'fatih/vim-go'
+hook_add = '''
+let g:go_metalinter_command='golangci-lint'
+nnoremap <S-E> :GoReferrers<CR>
+'''
