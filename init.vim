@@ -13,8 +13,12 @@ inoremap <silent> <C-j> j
 inoremap <silent> kk <ESC>
 inoremap <silent> <C-k> k
 
-"コードジャンプ時に別タブを開く
-nnoremap <C-]> :tabedit <C-R>=expand("<cfile>")<CR><CR>
+
+" ファイルが空の場合は閉じる
+if empty(expand('%:t'))
+    silent! bd!
+endif
+
 
 filetype indent on
 set listchars=tab:»-,trail:-,eol:↲,extends:»,precedes:«,nbsp:%
@@ -24,6 +28,8 @@ set tabstop=4
 set shiftwidth=4
 " タブをタブとして扱う(スペースに展開しない)
 set noexpandtab
+
+set encoding=UTF-8
 
 noremap <Up> <Nop>
 noremap <Down> <Nop>
@@ -139,17 +145,6 @@ function! ProfileCursorMove() abort
 endfunction
 
 
-"augroup vimrc-filetype
-"  autocmd!
-"  " PHPだったらインデント幅が４で
-"  autocmd BufNewFile,BufRead *.php set filetype=php
-"  autocmd FileType php setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
-"
-"  " Rubyだったらインデント幅は2にしたい
-"  autocmd BufNewFile,BufRead *.rb set filetype=ruby
-"  autocmd BufNewFile,BufRead *.ruby set filetype=ruby
-"  autocmd FileType ruby setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
-"augroup END
 if has('persistent_undo')
   set undodir=~/.vim/undo
   set undofile
@@ -171,9 +166,6 @@ function! s:show_documentation()
   endif
 endfunction
 
-" :nmap <C-n> :Defx -auto-recursive-level=1 -ignored-files=node_modules,.*<CR>
-:nmap <C-n> :Defx -resume -toggle -winwidth=30 -split=vertical -direction=topleft -listed -ignored-files=__pycache__,.mypy_cache,*.pyc<CR>
-" autocmd bufenter * if (winnr("$") == 1 && defx#is_opened_tree() == 'true') | defx#do_action('quit') | endif
 
 " 補完表示時のEnterで改行をしない
 inoremap <expr><CR>  pumvisible() ? "<C-y>" : "<CR>"
@@ -196,3 +188,14 @@ inoremap <silent><expr> <Tab>
 "" <Tab>で次、<S+Tab>で前
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" " quickfix-windowのデフォルトの表示位置を左端に変更
+" autocmd FileType qf wincmd H
+" " quickfix-windowを開き、modifiableに設定し、Windowサイズを調整
+" function! OpenQuickfixWindow()
+"         cw
+"         set modifiable
+"         vertical resize 30
+" endfunction
+" 
+" autocmd QuickfixCmdPost vimgrep call OpenQuickfixWindow()

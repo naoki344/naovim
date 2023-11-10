@@ -1,32 +1,9 @@
-#[[plugins]]
-#repo = 'Shougo/deoplete.nvim'
-#hook_add = 'let g:deoplete#enable_at_startup = 1'
-#depends = 'context_filetype.vim'
-#if = '''has('nvim')'''
-#on_event = 'InsertCharPre'
-#on_i = 1
-#hook_source = '''
-#let g:deoplete#enable_at_startup = 1
-#'''
-
-#[[plugins]]
-#repo = 'cespare/vim-toml'
-#
-#
-#[[plugins]]
-#repo = 'scrooloose/nerdcommenter'
-#
-#[[plugins]]
-#repo = 'rhysd/nyaovim-markdown-preview'
-#[[plugins]]
-#repo = 'yaasita/ore_markdown'
-#[[plugins]]
-#repo = 'mattn/emmet-vim'
-
-
-
-#[[plugins]]
-#repo = 'Shougo/neosnippet-snippets'
-
-#[[plugins]]
-#repo = 'Shougo/neocomplete.vim'
+# 括弧やクォートの類を自動で閉じてくれる。
+[[plugins]]
+ repo = 'windwp/nvim-autopairs'
+ on_event = 'BufEnter'
+ hook_source = '''
+ lua << EOF
+ require('nvim-autopairs').setup()
+EOF
+'''

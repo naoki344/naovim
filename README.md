@@ -13,6 +13,12 @@
 - :CocInstall coc-json
 
 
+### ripgrepのinstall(vim-ripgrep用)
+```
+brew install ripgrep
+```
+
+
 
 ## Vimium chromeをvimらいくにする
 ### https://qiita.com/satoshi03/items/9fdfcd0e46e095ec68c1
