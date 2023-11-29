@@ -9,10 +9,12 @@
 
 ### cocの準備
 - :call coc#util#install()
-- :CocInstall coc-python
 - :CocInstall coc-json
 
-
+### pythonの準備
+- :CocInstall coc-jedi
+- pip3 install jedi-language-server(使っているenv環境のpipでinstallする)
+- 
 ### ripgrepのinstall(vim-ripgrep用)
 ```
 brew install ripgrep
