@@ -44,7 +44,7 @@
 			}
 		}
 	},
-	"python.pythonPath": "~/.pyenv/versions/3.8.1/bin/python",
+	"python.pythonPath": "~/.venv/fbz/bin/python3",
 	"coc.preferences.rootPatterns": [
 		".vim",
 		".git",
@@ -67,9 +67,11 @@
 		"json",
 		".json"
 	],
-	"python.jediEnabled": true,
 	"codeLens.enable": true,
-	"python.jediPath": "~/.pyenv/versions/lib/python3.8/site-packages/",
+	"jedi": {
+		"enable": true,
+		"startupMessage": false
+	},
 	"coc.preferences.jumpCommand": "tabe",
 	"python.autoComplete.extraPaths": [
 		"${PYTHONPATH}"

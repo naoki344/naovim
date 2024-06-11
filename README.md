@@ -20,6 +20,10 @@
 brew install ripgrep
 ```
 
+```
+brew install fd
+```
+
 
 
 ## Vimium chromeをvimらいくにする
@@ -41,3 +45,12 @@ brew install ripgrep
 ```
 go get -u golang.org/x/tools/cmd/gopls
 ```
+
+
+### pythonの設定
+- 以下をinstallする
+```
+pip install jedi-language-server
+```
+
+- `:CocInstall coc-jedi` をneovimで実行

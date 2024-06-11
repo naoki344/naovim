@@ -1,10 +1,8 @@
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
 
-# # [[plugins]]
-# # repo = 'Shougo/deoplete.nvim'
-# # hook_add = 'let g:deoplete#enable_at_startup = 1'
-# 
+repo = 'psf/black'
+
 # # [[plugins]]
 # # repo = 'davidhalter/jedi-vim'
 # # hook_add = '''
