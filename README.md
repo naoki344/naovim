@@ -43,7 +43,7 @@ brew install fd
 
 #### 以下をinstallする
 ```
-go get -u golang.org/x/tools/cmd/gopls
+go install golang.org/x/tools/gopls@latest
 ```
 
 
