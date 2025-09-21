@@ -73,6 +73,7 @@ if ok_mason then
         "pyright",         -- Python
         "ts_ls",           -- TypeScript/JavaScript (updated from tsserver)
         "lua_ls",          -- Lua
+        "tailwindcss",     -- Tailwind CSS
         -- Ruby LSP will be handled separately due to dependency issues
       },
       automatic_installation = true,
@@ -217,11 +218,15 @@ end
 local function setup_lsp_server(name, config)
   if use_new_api then
     -- Use new vim.lsp.config API for Neovim 0.11+
-    vim.lsp.config(name, vim.tbl_extend('force', {
+    -- First, register the configuration
+    vim.lsp.config[name] = vim.tbl_extend('force', {
       cmd = config.cmd or {name},
       on_attach = on_attach,
       capabilities = capabilities,
-    }, config))
+    }, config)
+
+    -- Then enable it
+    vim.lsp.enable(name)
   else
     -- Use legacy lspconfig for older versions
     if lspconfig and lspconfig[name] then
@@ -308,6 +313,37 @@ setup_lsp_server('lua_ls', {
   },
 })
 
+-- Tailwind CSS (tailwindcss)
+setup_lsp_server('tailwindcss', {
+  cmd = { "tailwindcss-language-server", "--stdio" },
+  filetypes = {
+    "html",
+    "css",
+    "scss",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "svelte"
+  },
+  settings = {
+    tailwindCSS = {
+      classAttributes = { "class", "className", "classList", "ngClass" },
+      lint = {
+        cssConflict = "warning",
+        invalidApply = "error",
+        invalidConfigPath = "error",
+        invalidScreen = "error",
+        invalidTailwindDirective = "error",
+        invalidVariant = "error",
+        recommendedVariantOrder = "warning"
+      },
+      validate = true
+    }
+  }
+})
+
 -- Try to use mason's setup_handlers if available, but don't fail if not
 vim.schedule(function()
   local ok_mason_lsp, mason_lspconfig = pcall(require, 'mason-lspconfig')
@@ -315,7 +351,7 @@ vim.schedule(function()
     mason_lspconfig.setup_handlers({
       function(server_name)
         -- Only setup if we haven't already configured it above
-        if not vim.tbl_contains({'gopls', 'pyright', 'ts_ls', 'solargraph', 'ruby_lsp', 'lua_ls'}, server_name) then
+        if not vim.tbl_contains({'gopls', 'pyright', 'ts_ls', 'solargraph', 'ruby_lsp', 'lua_ls', 'tailwindcss'}, server_name) then
           setup_lsp_server(server_name, {})
         end
       end,
