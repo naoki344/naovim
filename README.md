@@ -1,5 +1,12 @@
 # naovim
 
+# fontのインストール
+https://github.com/ryanoasis/nerd-fonts#font-installation
+```
+brew tap homebrew/cask-fonts
+brew install font-hack-nerd-font
+```
+
 ## インストール方法
 ### vimのインストール
 - brew install neovim
