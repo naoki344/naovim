@@ -1,46 +1,5 @@
--- Manual plugin management using git submodules approach
-local plugin_dir = vim.fn.stdpath('data') .. '/site/pack/plugins/start'
-
--- Ensure plugin directory exists
-if vim.fn.isdirectory(plugin_dir) == 0 then
-  vim.fn.mkdir(plugin_dir, 'p')
-end
-
--- Function to install plugin if not exists
-local function ensure_plugin(repo, name)
-  local plugin_path = plugin_dir .. '/' .. name
-  if vim.fn.isdirectory(plugin_path) == 0 then
-    print('Installing ' .. name .. '...')
-    vim.fn.system('git clone https://github.com/' .. repo .. '.git ' .. plugin_path)
-  end
-end
-
--- Install essential plugins manually
-ensure_plugin('tomasr/molokai', 'molokai')
-ensure_plugin('kyazdani42/nvim-tree.lua', 'nvim-tree.lua')
-ensure_plugin('kyazdani42/nvim-web-devicons', 'nvim-web-devicons')
-ensure_plugin('tpope/vim-fugitive', 'vim-fugitive')
-ensure_plugin('airblade/vim-gitgutter', 'vim-gitgutter')
-ensure_plugin('itchyny/lightline.vim', 'lightline.vim')
-ensure_plugin('majutsushi/tagbar', 'tagbar')
-ensure_plugin('windwp/nvim-autopairs', 'nvim-autopairs')
-ensure_plugin('fatih/vim-go', 'vim-go')
-ensure_plugin('github/copilot.vim', 'copilot.vim')
-
--- Telescope plugins removed
-
--- LSP and completion plugins
-ensure_plugin('neovim/nvim-lspconfig', 'nvim-lspconfig')
-ensure_plugin('williamboman/mason.nvim', 'mason.nvim')
-ensure_plugin('williamboman/mason-lspconfig.nvim', 'mason-lspconfig.nvim')
-ensure_plugin('hrsh7th/nvim-cmp', 'nvim-cmp')
-ensure_plugin('hrsh7th/cmp-nvim-lsp', 'cmp-nvim-lsp')
-ensure_plugin('hrsh7th/cmp-buffer', 'cmp-buffer')
-ensure_plugin('hrsh7th/cmp-path', 'cmp-path')
-ensure_plugin('hrsh7th/cmp-cmdline', 'cmp-cmdline')
-ensure_plugin('L3MON4D3/LuaSnip', 'LuaSnip')
-ensure_plugin('saadparwaiz1/cmp_luasnip', 'cmp_luasnip')
-ensure_plugin('rafamadriz/friendly-snippets', 'friendly-snippets')
+-- Plugin management with dein.vim
+require('dein_setup')
 
 -- Configure plugins after Neovim starts
 vim.api.nvim_create_autocmd("VimEnter", {
