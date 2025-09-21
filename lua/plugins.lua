@@ -1,5 +1,5 @@
--- Plugin management with dein.vim
-require('dein_setup')
+-- Plugin management with lazy.nvim (using fzf instead of telescope)
+require('lazy-setup')
 
 -- Configure plugins after Neovim starts
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -41,8 +41,8 @@ vim.api.nvim_create_autocmd("VimEnter", {
     local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
     if ok_tree then
       nvim_tree.setup({
-        disable_netrw = true,
-        hijack_netrw = true,
+        disable_netrw = false,
+        hijack_netrw = false,
         sync_root_with_cwd = true,
         respect_buf_cwd = true,
         update_focused_file = {
@@ -53,6 +53,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
         view = {
           width = 30,
           side = "left",
+          preserve_window_proportions = true,
         },
         diagnostics = {
           enable = false,
@@ -311,33 +312,31 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
     -- Telescope setup removed
 
+    -- Setup CtrlP manually if not loaded by lazy
+    local ctrlp_ok = vim.fn.exists(':CtrlP') == 2
+    if ctrlp_ok then
+      -- CtrlP additional settings
+      vim.g.ctrlp_map = '<c-p>'
+      vim.g.ctrlp_working_path_mode = 'ra'
+      print('CtrlP setup completed')
+    else
+      print('CtrlP not available yet')
+    end
+
     -- LSP and completion setup is handled in lsp.lua
   end
 })
 
--- Setup nvim-tree auto-open outside the VimEnter callback
-vim.api.nvim_create_autocmd("VimEnter", {
-  nested = true,
-  callback = function()
-    -- Ensure we're after all other VimEnter events
-    vim.schedule(function()
-      local ok_tree = pcall(require, 'nvim-tree.api')
-      if ok_tree then
-        -- Check if nvim-tree is not already open
-        local tree_wins = vim.tbl_filter(function(win_id)
-          local buf_id = vim.api.nvim_win_get_buf(win_id)
-          local ok, filetype = pcall(vim.api.nvim_buf_get_option, buf_id, 'filetype')
-          return ok and filetype == 'NvimTree'
-        end, vim.api.nvim_list_wins())
-
-        if #tree_wins == 0 then
-          vim.cmd('NvimTreeOpen')
-          -- If we have multiple windows, focus on the non-tree window
-          if #vim.api.nvim_list_wins() > 1 then
-            vim.cmd('wincmd p')
-          end
-        end
-      end
-    end)
-  end,
-})
+-- nvim-tree auto-open temporarily disabled to avoid fzf conflicts
+-- Use :NvimTreeToggle manually when needed
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--   nested = true,
+--   callback = function()
+--     vim.defer_fn(function()
+--       vim.cmd('NvimTreeOpen')
+--       if #vim.api.nvim_list_wins() > 1 then
+--         vim.cmd('wincmd p')
+--       end
+--     end, 300)
+--   end,
+-- })
