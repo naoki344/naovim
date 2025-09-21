@@ -76,6 +76,35 @@ local plugins = {
         dir = '\\.git$\\|\\.cache$\\|\\.local$\\|node_modules$\\|target$\\|\\.build$',
         file = '\\.so$\\|\\.swp$\\|\\.zip$\\|\\.pyc$'
       }
+
+      -- Custom key mappings for CtrlP
+      vim.g.ctrlp_prompt_mappings = {
+        -- Insert mode mappings
+        ['<C-j>'] = {'<Down>'},
+        ['<C-k>'] = {'<Up>'},
+        ['<Tab>'] = {'<Down>'},
+        ['<S-Tab>'] = {'<Up>'},
+        ['<CR>'] = {'<C-y>'},  -- Accept selection and close
+        ['<Esc>'] = {'<C-c>'},
+        ['<C-c>'] = {'<C-c>'},
+
+        -- Normal mode mappings
+        ['<C-j>'] = {'<Down>'},
+        ['<C-k>'] = {'<Up>'},
+        ['<Tab>'] = {'<Down>'},
+        ['<S-Tab>'] = {'<Up>'},
+        ['<CR>'] = {'<C-y>'},
+        ['q'] = {'<C-c>'},
+        ['<Esc>'] = {'<C-c>'},
+
+        -- Additional useful mappings
+        ['<C-x>'] = {'<C-s>'},  -- Open in horizontal split
+        ['<C-v>'] = {'<C-v>'},  -- Open in vertical split
+        ['<C-t>'] = {'<C-t>'},  -- Open in new tab
+      }
+
+      -- Ensure CtrlP starts in insert mode
+      vim.g.ctrlp_insert_mode = 1
     end,
     config = function()
       print('CtrlP setup completed')
