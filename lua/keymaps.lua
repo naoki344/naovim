@@ -32,6 +32,10 @@ vim.keymap.set('n', '<leader>nr', function()
   local nvim_tree_api_ok, nvim_tree_api = pcall(require, 'nvim-tree.api')
   if nvim_tree_api_ok then
     nvim_tree_api.tree.reload()
+    -- Force refresh error marks after reload
+    vim.defer_fn(function()
+      vim.cmd('doautocmd User NvimTreeRefresh')
+    end, 200)
   end
 end, { desc = 'Refresh tree with diagnostics' })
 

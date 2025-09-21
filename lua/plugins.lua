@@ -165,12 +165,22 @@ vim.api.nvim_create_autocmd("VimEnter", {
         -- Get all diagnostics
         local diagnostics = vim.diagnostic.get()
         local files_with_errors = {}
+        local dirs_with_errors = {}
 
         for _, diag in ipairs(diagnostics) do
           if diag.severity == vim.diagnostic.severity.ERROR then
             local file = vim.api.nvim_buf_get_name(diag.bufnr)
             if file and file ~= "" then
               files_with_errors[file] = true
+
+              -- Also mark all parent directories as having errors
+              local dir = vim.fn.fnamemodify(file, ":h")
+              while dir and dir ~= "/" and dir ~= "" do
+                dirs_with_errors[dir] = true
+                local parent = vim.fn.fnamemodify(dir, ":h")
+                if parent == dir then break end
+                dir = parent
+              end
             end
           end
         end
@@ -187,13 +197,33 @@ vim.api.nvim_create_autocmd("VimEnter", {
               -- Add virtual text for each line
               local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
               for i, line in ipairs(lines) do
+                local marked = false
+
+                -- Check for error files
                 for file_path, _ in pairs(files_with_errors) do
                   local filename = vim.fn.fnamemodify(file_path, ":t")
-                  if line:find(filename, 1, true) then
+                  if line:find(filename, 1, true) and not marked then
                     vim.api.nvim_buf_set_extmark(buf, ns_id, i - 1, 0, {
                       virt_text = {{ " ✗", "DiagnosticError" }},
                       virt_text_pos = "eol",
                     })
+                    marked = true
+                    break
+                  end
+                end
+
+                -- Check for error directories (only if not already marked as file)
+                if not marked then
+                  for dir_path, _ in pairs(dirs_with_errors) do
+                    local dirname = vim.fn.fnamemodify(dir_path, ":t")
+                    if dirname ~= "" and line:find(dirname, 1, true) then
+                      vim.api.nvim_buf_set_extmark(buf, ns_id, i - 1, 0, {
+                        virt_text = {{ " ✗", "DiagnosticError" }},
+                        virt_text_pos = "eol",
+                      })
+                      marked = true
+                      break
+                    end
                   end
                 end
               end
@@ -210,11 +240,42 @@ vim.api.nvim_create_autocmd("VimEnter", {
         end,
       })
 
-      -- Update when nvim-tree is refreshed
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "NvimTreeSetup",
+      -- Update when nvim-tree buffer changes
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "NvimTree_*",
         callback = function()
           vim.defer_fn(highlight_error_files, 100)
+        end,
+      })
+
+      -- Update when nvim-tree is refreshed or redrawn
+      vim.api.nvim_create_autocmd("User", {
+        pattern = {"NvimTreeSetup", "NvimTreeRefresh"},
+        callback = function()
+          vim.defer_fn(highlight_error_files, 100)
+        end,
+      })
+
+      -- Update on buffer write (when errors might change)
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        callback = function()
+          vim.defer_fn(highlight_error_files, 200)
+        end,
+      })
+
+      -- Continuously monitor nvim-tree buffer changes
+      vim.api.nvim_create_autocmd("TextChanged", {
+        pattern = "NvimTree_*",
+        callback = function()
+          vim.defer_fn(highlight_error_files, 50)
+        end,
+      })
+
+      -- Monitor cursor movement in nvim-tree
+      vim.api.nvim_create_autocmd("CursorMoved", {
+        pattern = "NvimTree_*",
+        callback = function()
+          vim.defer_fn(highlight_error_files, 50)
         end,
       })
 
