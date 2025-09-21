@@ -1,3 +1,4 @@
 .netrwhist
+node_modules/*
 shada/*
 swap/*
