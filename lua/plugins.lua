@@ -325,17 +325,18 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
     -- LSP and completion setup is handled in lsp.lua
 
-    -- Setup colorizer for color preview
-    local ok_colorizer, colorizer = pcall(require, 'colorizer')
-    if ok_colorizer then
-      -- Enable colorizer for the current buffer
-      vim.cmd('ColorizerAttachToBuffer')
-    end
+    -- Force colorizer to work on all buffers
+    vim.schedule(function()
+      local ok_colorizer = pcall(require, 'colorizer')
+      if ok_colorizer then
+        vim.cmd('ColorizerReloadAllBuffers')
+        print('Colorizer reloaded for all buffers')
+      end
+    end)
 
     -- Setup Tailwind CSS colors
     local ok_tw_colors, tw_colors = pcall(require, 'tailwindcss-colors')
     if ok_tw_colors then
-      -- This plugin automatically highlights Tailwind color classes
       print('Tailwind CSS colors plugin loaded')
     end
   end

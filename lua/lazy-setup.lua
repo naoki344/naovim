@@ -141,27 +141,57 @@ local plugins = {
   },
   "github/copilot.vim",
 
+  -- React/JavaScript/TypeScript specific
+  {
+    "maxmellon/vim-jsx-pretty",
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  },
+  {
+    "HerringtonDarkholme/yats.vim",
+    ft = { "typescript", "typescriptreact" },
+  },
+  {
+    "styled-components/vim-styled-components",
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  },
+  {
+    "mattn/emmet-vim",
+    ft = { "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+    config = function()
+      vim.g.user_emmet_leader_key = '<C-y>'
+      vim.g.user_emmet_settings = {
+        javascript = {
+          extends = 'jsx',
+        },
+        typescript = {
+          extends = 'tsx',
+        },
+      }
+    end,
+  },
+
   -- Color highlighting and preview
   {
     "norcalli/nvim-colorizer.lua",
+    lazy = false,
     config = function()
       require('colorizer').setup({
-        '*', -- Highlight all files, but customize some others.
-        css = { rgb_fn = true }, -- Enable parsing rgb(...) functions in css.
-        html = { names = false }, -- Disable parsing "names" like Blue or Gray
+        '*', -- Enable for all filetypes
       }, {
         RGB = true, -- #RGB hex codes
         RRGGBB = true, -- #RRGGBB hex codes
-        names = true, -- "Name" codes like Blue or red
+        names = false, -- "Name" codes like Blue or red
         RRGGBBAA = false, -- #RRGGBBAA hex codes
-        AARRGGBB = false, -- 0xAARRGGBB hex codes
         rgb_fn = true, -- CSS rgb() and rgba() functions
         hsl_fn = true, -- CSS hsl() and hsla() functions
         css = true, -- Enable all CSS features: rgb_fn, hsl_fn, names, RGB, RRGGBB
         css_fn = true, -- Enable all CSS *functions*: rgb_fn, hsl_fn
         mode = 'background', -- Set the display mode.
-        tailwind = true, -- Enable tailwind colors
+        tailwind = 'both', -- Enable tailwind colors
       })
+
+      -- Start colorizer automatically
+      vim.cmd('ColorizerReloadAllBuffers')
     end,
   },
   {

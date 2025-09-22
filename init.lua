@@ -17,6 +17,21 @@ vim.opt.expandtab = true
 -- Enable filetype detection and indentation
 vim.cmd('filetype indent on')
 
+-- Enhanced TypeScript file type detection
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+  pattern = {"*.ts", "*.tsx"},
+  callback = function()
+    vim.bo.filetype = "typescript"
+  end,
+})
+
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+  pattern = {"*.jsx"},
+  callback = function()
+    vim.bo.filetype = "javascriptreact"
+  end,
+})
+
 -- List characters
 vim.opt.listchars = {
   tab = '»-',

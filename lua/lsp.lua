@@ -1,18 +1,10 @@
 -- LSP Configuration with mason.nvim and nvim-cmp
 
--- Check Neovim version for API compatibility
-local nvim_version = vim.version()
-local use_new_api = nvim_version.major > 0 or (nvim_version.major == 0 and nvim_version.minor >= 11)
-
 -- Setup LSP first
-local lspconfig = nil
-if not use_new_api then
-  local ok_lspconfig
-  ok_lspconfig, lspconfig = pcall(require, 'lspconfig')
-  if not ok_lspconfig then
-    print("nvim-lspconfig not available")
-    return
-  end
+local ok_lspconfig, lspconfig = pcall(require, 'lspconfig')
+if not ok_lspconfig then
+  print("nvim-lspconfig not available")
+  return
 end
 
 -- Add LSP capabilities to completion
@@ -48,6 +40,24 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
   vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
   vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, bufopts)
+
+  -- Show diagnostics on cursor hold for TypeScript/JavaScript files
+  if client.name == "ts_ls" then
+    vim.api.nvim_create_autocmd("CursorHold", {
+      buffer = bufnr,
+      callback = function()
+        local opts = {
+          focusable = false,
+          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+          border = 'rounded',
+          source = 'always',
+          prefix = ' ',
+          scope = 'cursor',
+        }
+        vim.diagnostic.open_float(nil, opts)
+      end
+    })
+  end
 end
 
 -- Setup mason for LSP server management
@@ -69,11 +79,11 @@ if ok_mason then
     -- Ensure these LSP servers are installed
     mason_lspconfig.setup({
       ensure_installed = {
-        "gopls",           -- Go
-        "pyright",         -- Python
-        "ts_ls",           -- TypeScript/JavaScript (updated from tsserver)
-        "lua_ls",          -- Lua
-        "tailwindcss",     -- Tailwind CSS
+        "gopls",                        -- Go
+        "pyright",                      -- Python
+        "typescript-language-server",   -- TypeScript/JavaScript
+        "lua_ls",                       -- Lua
+        "tailwindcss-language-server",  -- Tailwind CSS
         -- Ruby LSP will be handled separately due to dependency issues
       },
       automatic_installation = true,
@@ -156,55 +166,27 @@ cmp.setup.cmdline(':', {
 
 -- Configure diagnostics
 vim.diagnostic.config({
-  virtual_text = true,
-  signs = true,
+  virtual_text = {
+    enabled = true,
+    source = "if_many",
+    spacing = 4,
+    prefix = "●",
+  },
+  signs = {
+    active = true,
+    priority = 8,
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
-})
-
--- Diagnostic signs
-local signs = { Error = "✗", Warn = "⚠", Hint = "ⓘ", Info = "»" }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
-
--- LSP keymaps
-local on_attach = function(client, bufnr)
-  local bufopts = { noremap = true, silent = true, buffer = bufnr }
-
-  -- LSP keymaps
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-  vim.keymap.set('n', '<space>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, bufopts)
-  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
-
-  -- Diagnostic keymaps
-  vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, bufopts)
-  vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
-  vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
-  vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, bufopts)
-end
-
--- Configure diagnostics
-vim.diagnostic.config({
-  virtual_text = true,
-  signs = true,
-  underline = true,
-  update_in_insert = false,
-  severity_sort = true,
+  float = {
+    focusable = false,
+    style = "minimal",
+    border = "rounded",
+    source = "always",
+    header = "",
+    prefix = "",
+  },
 })
 
 -- Diagnostic signs
@@ -216,25 +198,14 @@ end
 
 -- Helper function to setup LSP server
 local function setup_lsp_server(name, config)
-  if use_new_api then
-    -- Use new vim.lsp.config API for Neovim 0.11+
-    -- First, register the configuration
-    vim.lsp.config[name] = vim.tbl_extend('force', {
-      cmd = config.cmd or {name},
+  if lspconfig and lspconfig[name] then
+    lspconfig[name].setup(vim.tbl_extend('force', {
       on_attach = on_attach,
       capabilities = capabilities,
-    }, config)
-
-    -- Then enable it
-    vim.lsp.enable(name)
+    }, config))
+    print("LSP server configured: " .. name)
   else
-    -- Use legacy lspconfig for older versions
-    if lspconfig and lspconfig[name] then
-      lspconfig[name].setup(vim.tbl_extend('force', {
-        on_attach = on_attach,
-        capabilities = capabilities,
-      }, config))
-    end
+    print("LSP server not available: " .. name)
   end
 end
 
@@ -265,13 +236,47 @@ setup_lsp_server('pyright', {
   },
 })
 
--- TypeScript (ts_ls - updated from tsserver)
+-- TypeScript (ts_ls)
 setup_lsp_server('ts_ls', {
+  filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
   settings = {
     typescript = {
+      inlayHints = {
+        includeInlayParameterNameHints = 'all',
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
       preferences = {
-        importModuleSpecifier = "relative"
-      }
+        importModuleSpecifier = "relative",
+        includePackageJsonAutoImports = "auto",
+      },
+      suggest = {
+        includeCompletionsForModuleExports = true,
+      },
+      validate = { enable = true },
+    },
+    javascript = {
+      inlayHints = {
+        includeInlayParameterNameHints = 'all',
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
+      preferences = {
+        importModuleSpecifier = "relative",
+        includePackageJsonAutoImports = "auto",
+      },
+      suggest = {
+        includeCompletionsForModuleExports = true,
+      },
+      validate = { enable = true },
     }
   }
 })
