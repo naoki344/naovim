@@ -4,6 +4,11 @@ vim.opt.swapfile = false
 vim.opt.updatetime = 250
 vim.opt.clipboard = "unnamed"
 
+-- Enable true color support (required for color previews)
+if vim.fn.has('termguicolors') == 1 then
+  vim.opt.termguicolors = true
+end
+
 -- Tab settings
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4

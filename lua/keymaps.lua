@@ -98,3 +98,8 @@ vim.keymap.set('n', '<C-E>', ':GoReferrers<CR>')
 vim.api.nvim_create_user_command('Ripgrep', function(opts)
   vim.fn['ripgrep#search'](opts.args)
 end, { nargs = '*', complete = 'file' })
+
+-- Color preview toggle mappings
+vim.keymap.set('n', '<leader>ct', ':ColorizerToggle<CR>', { desc = 'Toggle color preview' })
+vim.keymap.set('n', '<leader>ca', ':ColorizerAttachToBuffer<CR>', { desc = 'Attach color preview to buffer' })
+vim.keymap.set('n', '<leader>cd', ':ColorizerDetachFromBuffer<CR>', { desc = 'Detach color preview from buffer' })
