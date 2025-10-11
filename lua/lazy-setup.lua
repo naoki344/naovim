@@ -173,10 +173,6 @@ local plugins = {
             height = 0.80,
             preview_cutoff = 120,
           },
-          -- Ensure proper window management
-          sorting_strategy = "ascending",
-          winblend = 0,
-          wrap_results = false,
         },
         pickers = {
           find_files = {
