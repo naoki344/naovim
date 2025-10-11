@@ -60,6 +60,15 @@ local on_attach = function(client, bufnr)
   end
 end
 
+-- Auto-format on save for TypeScript/JavaScript files using LSP
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+  callback = function()
+    -- Use LSP's built-in formatter (very fast, no external process needed)
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
 -- Setup mason for LSP server management
 local ok_mason, mason = pcall(require, 'mason')
 if ok_mason then
