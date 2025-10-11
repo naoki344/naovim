@@ -128,7 +128,7 @@ local plugins = {
       { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
       { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
       { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
-      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+      { "<leader>fr", "<cmd>Telescope oldfiles cwd_only=true<cr>", desc = "Recent files (cwd)" },
       { "<leader>fc", "<cmd>Telescope commands<cr>", desc = "Commands" },
       { "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },
       { "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
@@ -177,6 +177,9 @@ local plugins = {
         pickers = {
           find_files = {
             hidden = true,
+          },
+          oldfiles = {
+            cwd_only = true,  -- Only show files in current working directory
           },
         },
       })

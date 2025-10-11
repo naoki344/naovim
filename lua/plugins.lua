@@ -311,6 +311,21 @@ vim.api.nvim_create_autocmd("VimEnter", {
     if ok_tw_colors then
       print('Tailwind CSS colors plugin loaded')
     end
+
+    -- Auto-open Telescope oldfiles on startup (if no file arguments)
+    vim.schedule(function()
+      -- Only open if no files were specified on command line
+      local args = vim.fn.argv()
+      if #args == 0 then
+        -- Delay to ensure Telescope is fully loaded
+        vim.defer_fn(function()
+          local ok_telescope = pcall(require, 'telescope.builtin')
+          if ok_telescope then
+            vim.cmd('Telescope oldfiles cwd_only=true')
+          end
+        end, 100)
+      end
+    end)
   end
 })
 

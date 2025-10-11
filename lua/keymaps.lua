@@ -65,6 +65,10 @@ vim.keymap.set('n', '<C-b>', function()
   require('telescope.builtin').buffers()
 end, { desc = 'Switch buffer with Telescope' })
 
+vim.keymap.set('n', '<C-o>', function()
+  require('telescope.builtin').oldfiles({ cwd_only = true })
+end, { desc = 'Recent files (cwd) with Telescope' })
+
 -- LSP mappings (defined in lsp.lua on_attach function)
 -- gD - Go to declaration
 -- gd - Go to definition
