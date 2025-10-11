@@ -40,11 +40,41 @@ vim.api.nvim_create_autocmd("VimEnter", {
     -- Setup nvim-tree
     local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
     if ok_tree then
+      -- Custom key mappings for nvim-tree
+      local function nvim_tree_on_attach(bufnr)
+        local api = require('nvim-tree.api')
+
+        local function opts(desc)
+          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        -- Default mappings
+        api.config.mappings.default_on_attach(bufnr)
+
+        -- Custom mappings for better split handling
+        -- <CR> or o: Open in last focused window (allows multiple files in different splits)
+        vim.keymap.set('n', '<CR>', api.node.open.edit, opts('Open'))
+        vim.keymap.set('n', 'o', api.node.open.edit, opts('Open'))
+
+        -- v: Open in new vertical split
+        vim.keymap.set('n', 'v', api.node.open.vertical, opts('Open: Vertical Split'))
+        vim.keymap.set('n', '<C-v>', api.node.open.vertical, opts('Open: Vertical Split'))
+
+        -- s: Open in new horizontal split
+        vim.keymap.set('n', 's', api.node.open.horizontal, opts('Open: Horizontal Split'))
+        vim.keymap.set('n', '<C-x>', api.node.open.horizontal, opts('Open: Horizontal Split'))
+
+        -- t: Open in new tab
+        vim.keymap.set('n', 't', api.node.open.tab, opts('Open: New Tab'))
+        vim.keymap.set('n', '<C-t>', api.node.open.tab, opts('Open: New Tab'))
+      end
+
       nvim_tree.setup({
         disable_netrw = false,
         hijack_netrw = false,
         sync_root_with_cwd = true,
         respect_buf_cwd = true,
+        on_attach = nvim_tree_on_attach,
         update_focused_file = {
           enable = true,
           update_root = true,
@@ -53,7 +83,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
         view = {
           width = 30,
           side = "left",
-          preserve_window_proportions = true,
+          preserve_window_proportions = false,
         },
         diagnostics = {
           enable = false,
@@ -91,6 +121,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
           open_file = {
             quit_on_open = false,
             resize_window = true,
+            window_picker = {
+              enable = false,
+            },
           },
         },
       })
