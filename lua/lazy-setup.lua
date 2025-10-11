@@ -107,7 +107,7 @@ local plugins = {
       vim.g.ctrlp_insert_mode = 1
     end,
     config = function()
-      print('CtrlP setup completed')
+      -- CtrlP configured silently
     end,
   },
 
@@ -311,6 +311,10 @@ lazy.setup(plugins, {
   },
   checker = {
     enabled = true,
+    notify = false,  -- Don't show update notifications on startup
+  },
+  rocks = {
+    enabled = false,  -- Disable luarocks support (not needed for current plugins)
   },
   ui = {
     backdrop = 100,
@@ -331,5 +335,4 @@ lazy.setup(plugins, {
   },
 })
 
-print('lazy.nvim setup completed')
 return true

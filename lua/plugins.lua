@@ -31,12 +31,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
     -- Go settings
     vim.g.go_metalinter_command = 'golangci-lint'
 
-    -- Define diagnostic signs for nvim-tree before setup
-    vim.fn.sign_define("NvimTreeDiagnosticErrorIcon", { text = "✗", texthl = "DiagnosticError" })
-    vim.fn.sign_define("NvimTreeDiagnosticWarnIcon", { text = "", texthl = "DiagnosticWarn" })
-    vim.fn.sign_define("NvimTreeDiagnosticInfoIcon", { text = "", texthl = "DiagnosticInfo" })
-    vim.fn.sign_define("NvimTreeDiagnosticHintIcon", { text = "", texthl = "DiagnosticHint" })
-
     -- Setup nvim-tree
     local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
     if ok_tree then
@@ -290,9 +284,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
       -- CtrlP additional settings
       vim.g.ctrlp_map = '<c-p>'
       vim.g.ctrlp_working_path_mode = 'ra'
-      print('CtrlP setup completed')
-    else
-      print('CtrlP not available yet')
     end
 
     -- LSP and completion setup is handled in lsp.lua
@@ -302,15 +293,11 @@ vim.api.nvim_create_autocmd("VimEnter", {
       local ok_colorizer = pcall(require, 'colorizer')
       if ok_colorizer then
         vim.cmd('ColorizerReloadAllBuffers')
-        print('Colorizer reloaded for all buffers')
       end
     end)
 
     -- Setup Tailwind CSS colors
-    local ok_tw_colors, tw_colors = pcall(require, 'tailwindcss-colors')
-    if ok_tw_colors then
-      print('Tailwind CSS colors plugin loaded')
-    end
+    pcall(require, 'tailwindcss-colors')
 
     -- Auto-open Telescope oldfiles on startup (if no file arguments)
     vim.schedule(function()

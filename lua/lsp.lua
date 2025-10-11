@@ -1,9 +1,22 @@
 -- LSP Configuration with mason.nvim and nvim-cmp
 
+-- Suppress lspconfig deprecation warnings
+local original_notify = vim.notify
+vim.notify = function(msg, level, opts)
+  -- Filter out lspconfig deprecation warnings
+  if msg and msg:match("lspconfig.*deprecated") then
+    return
+  end
+  original_notify(msg, level, opts)
+end
+
 -- Setup LSP first
 local ok_lspconfig, lspconfig = pcall(require, 'lspconfig')
+
+-- Restore original notify
+vim.notify = original_notify
+
 if not ok_lspconfig then
-  print("nvim-lspconfig not available")
   return
 end
 
@@ -88,11 +101,11 @@ if ok_mason then
     -- Ensure these LSP servers are installed
     mason_lspconfig.setup({
       ensure_installed = {
-        "gopls",                        -- Go
-        "pyright",                      -- Python
-        "typescript-language-server",   -- TypeScript/JavaScript
-        "lua_ls",                       -- Lua
-        "tailwindcss-language-server",  -- Tailwind CSS
+        "gopls",       -- Go
+        "pyright",     -- Python
+        "ts_ls",       -- TypeScript/JavaScript (correct name)
+        "lua_ls",      -- Lua
+        "tailwindcss", -- Tailwind CSS (correct name)
         -- Ruby LSP will be handled separately due to dependency issues
       },
       automatic_installation = true,
@@ -182,7 +195,12 @@ vim.diagnostic.config({
     prefix = "●",
   },
   signs = {
-    active = true,
+    text = {
+      [vim.diagnostic.severity.ERROR] = "✗",
+      [vim.diagnostic.severity.WARN] = "⚠",
+      [vim.diagnostic.severity.HINT] = "ⓘ",
+      [vim.diagnostic.severity.INFO] = "»",
+    },
     priority = 8,
   },
   underline = true,
@@ -198,13 +216,6 @@ vim.diagnostic.config({
   },
 })
 
--- Diagnostic signs
-local signs = { Error = "✗", Warn = "⚠", Hint = "ⓘ", Info = "»" }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
-
 -- Helper function to setup LSP server
 local function setup_lsp_server(name, config)
   if lspconfig and lspconfig[name] then
@@ -212,9 +223,7 @@ local function setup_lsp_server(name, config)
       on_attach = on_attach,
       capabilities = capabilities,
     }, config))
-    print("LSP server configured: " .. name)
-  else
-    print("LSP server not available: " .. name)
+    -- Silently configured
   end
 end
 
