@@ -39,46 +39,25 @@ vim.keymap.set('n', '<leader>nr', function()
   end
 end, { desc = 'Refresh tree with diagnostics' })
 
--- File search mappings (using Vim built-in commands)
-vim.keymap.set('n', '<C-p>', function()
-  vim.cmd('edit .')
-end, { desc = 'Open file browser' })
+-- File search mappings (Telescope handles these via lazy-setup.lua)
+-- <C-p> - Find files (Telescope)
+-- <leader>ff - Find files (Telescope)
+-- <leader>fg - Live grep (Telescope)
+-- <leader>fb - Buffers (Telescope)
+-- <leader>fh - Help tags (Telescope)
+-- <leader>fr - Recent files (Telescope)
+-- <leader>fc - Commands (Telescope)
+-- <leader>fs - Document symbols (Telescope)
+-- <leader>fd - Diagnostics (Telescope)
 
+-- Additional custom search mappings
 vim.keymap.set('n', '<C-g>', function()
-  local pattern = vim.fn.input('Search for: ')
-  if pattern ~= '' then
-    vim.cmd('vimgrep /' .. vim.fn.escape(pattern, '/') .. '/j **/*')
-    vim.cmd('copen')
-  end
-end, { desc = 'Search in files' })
+  require('telescope.builtin').live_grep()
+end, { desc = 'Live grep with Telescope' })
 
 vim.keymap.set('n', '<C-b>', function()
-  vim.cmd('buffers')
-  local buf_num = vim.fn.input('Buffer number (or name): ')
-  if buf_num ~= '' then
-    if tonumber(buf_num) then
-      vim.cmd('buffer ' .. buf_num)
-    else
-      vim.cmd('buffer ' .. buf_num)
-    end
-  end
-end, { desc = 'Switch buffer' })
-
--- Additional file navigation
-vim.keymap.set('n', '<leader>ff', function()
-  vim.cmd('edit .')
-end, { desc = 'File browser' })
-
-vim.keymap.set('n', '<leader>fg', function()
-  local pattern = vim.fn.input('Search for: ')
-  if pattern ~= '' then
-    vim.cmd('vimgrep /' .. vim.fn.escape(pattern, '/') .. '/j **/*')
-    vim.cmd('copen')
-  end
-end, { desc = 'Grep in files' })
-
-vim.keymap.set('n', '<leader>fb', ':buffers<CR>', { desc = 'List buffers' })
-vim.keymap.set('n', '<leader>fh', ':help<CR>', { desc = 'Help' })
+  require('telescope.builtin').buffers()
+end, { desc = 'Switch buffer with Telescope' })
 
 -- LSP mappings (defined in lsp.lua on_attach function)
 -- gD - Go to declaration

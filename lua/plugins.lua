@@ -276,14 +276,24 @@ vim.api.nvim_create_autocmd("VimEnter", {
               'terminal'
             }
 
-            -- Check if Telescope is currently active
+            -- Check if Telescope is currently active or transitioning
             local telescope_active = false
             for _, win in ipairs(vim.api.nvim_list_wins()) do
-              local win_buf = vim.api.nvim_win_get_buf(win)
-              local win_ft_ok, win_ft = pcall(vim.api.nvim_buf_get_option, win_buf, 'filetype')
-              if win_ft_ok and (win_ft == 'TelescopePrompt' or win_ft == 'TelescopeResults') then
-                telescope_active = true
-                break
+              if vim.api.nvim_win_is_valid(win) then
+                local win_buf_ok, win_buf = pcall(vim.api.nvim_win_get_buf, win)
+                if win_buf_ok and vim.api.nvim_buf_is_valid(win_buf) then
+                  local win_ft_ok, win_ft = pcall(vim.api.nvim_buf_get_option, win_buf, 'filetype')
+                  if win_ft_ok and (win_ft == 'TelescopePrompt' or win_ft == 'TelescopeResults') then
+                    telescope_active = true
+                    break
+                  end
+                  -- Also check buffer name for Telescope buffers
+                  local buf_name_ok, buf_name = pcall(vim.api.nvim_buf_get_name, win_buf)
+                  if buf_name_ok and buf_name:match("Telescope") then
+                    telescope_active = true
+                    break
+                  end
+                end
               end
             end
 
@@ -291,12 +301,27 @@ vim.api.nvim_create_autocmd("VimEnter", {
                filetype_ok and not vim.tbl_contains(skip_filetypes, filetype) and
                not telescope_active then
               if not is_nvim_tree_open() then
-                -- Defer the tree opening to avoid conflicts with other plugins
+                -- Defer the tree opening longer to ensure Telescope windows are fully closed
                 vim.defer_fn(function()
-                  if not is_nvim_tree_open() then
+                  -- Double-check Telescope is not active before opening tree
+                  local still_telescope_active = false
+                  for _, win in ipairs(vim.api.nvim_list_wins()) do
+                    if vim.api.nvim_win_is_valid(win) then
+                      local win_buf_ok, win_buf = pcall(vim.api.nvim_win_get_buf, win)
+                      if win_buf_ok and vim.api.nvim_buf_is_valid(win_buf) then
+                        local win_ft_ok, win_ft = pcall(vim.api.nvim_buf_get_option, win_buf, 'filetype')
+                        if win_ft_ok and (win_ft == 'TelescopePrompt' or win_ft == 'TelescopeResults') then
+                          still_telescope_active = true
+                          break
+                        end
+                      end
+                    end
+                  end
+
+                  if not still_telescope_active and not is_nvim_tree_open() then
                     open_tree_and_focus_back()
                   end
-                end, 100)
+                end, 200)
               end
             end
           end

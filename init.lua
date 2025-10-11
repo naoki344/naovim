@@ -1,3 +1,7 @@
+-- Leader key settings (must be set before plugins are loaded)
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 -- Basic settings
 vim.opt.number = true
 vim.opt.swapfile = false
@@ -72,10 +76,18 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end
 })
 
--- Auto close empty buffer
+-- Auto close empty buffer (but skip special buffers like Telescope)
 local function close_empty_buffer()
+  -- Skip if buffer name is empty
   if vim.fn.expand('%:t') == '' then
-    vim.cmd('silent! bd!')
+    -- Skip special buffer types
+    local buftype = vim.bo.buftype
+    local filetype = vim.bo.filetype
+
+    -- Don't close Telescope, quickfix, help, or other special buffers
+    if buftype == '' and filetype == '' then
+      vim.cmd('silent! bd!')
+    end
   end
 end
 

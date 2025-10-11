@@ -111,6 +111,85 @@ local plugins = {
     end,
   },
 
+  -- Telescope fuzzy finder
+  {
+    "nvim-telescope/telescope.nvim",
+    tag = '0.1.8',
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+      },
+    },
+    cmd = "Telescope",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+      { "<leader>fc", "<cmd>Telescope commands<cr>", desc = "Commands" },
+      { "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },
+      { "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
+      { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+    },
+    config = function()
+      local telescope = require('telescope')
+      local actions = require('telescope.actions')
+
+      telescope.setup({
+        defaults = {
+          mappings = {
+            i = {
+              ["<C-j>"] = actions.move_selection_next,
+              ["<C-k>"] = actions.move_selection_previous,
+              ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+              ["<Esc>"] = actions.close,
+              ["<C-c>"] = actions.close,
+            },
+            n = {
+              ["q"] = actions.close,
+              ["<Esc>"] = actions.close,
+            },
+          },
+          file_ignore_patterns = {
+            "node_modules",
+            ".git/",
+            "%.lock",
+            "target/",
+            "build/",
+            "dist/",
+          },
+          layout_config = {
+            horizontal = {
+              preview_width = 0.55,
+              results_width = 0.8,
+            },
+            vertical = {
+              mirror = false,
+            },
+            width = 0.87,
+            height = 0.80,
+            preview_cutoff = 120,
+          },
+          -- Ensure proper window management
+          sorting_strategy = "ascending",
+          winblend = 0,
+          wrap_results = false,
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
+      })
+
+      -- Load fzf native extension for better performance
+      pcall(telescope.load_extension, 'fzf')
+    end,
+  },
+
   -- UI and theme
   "tomasr/molokai",
   {
