@@ -140,29 +140,16 @@ local plugins = {
 
       telescope.setup({
         defaults = {
-          mappings = {
-            i = {
-              ["<C-j>"] = actions.move_selection_next,
-              ["<C-k>"] = actions.move_selection_previous,
-              ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
-              ["<Esc>"] = actions.close,
-              ["<C-c>"] = actions.close,
-            },
-            n = {
-              ["q"] = actions.close,
-              ["<Esc>"] = actions.close,
-            },
-          },
-          file_ignore_patterns = {
-            "node_modules",
-            ".git/",
-            "%.lock",
-            "target/",
-            "build/",
-            "dist/",
-          },
+          -- 検索結果のソート改善
+          sorting_strategy = "ascending",
+          file_sorter = require('telescope.sorters').get_fuzzy_file,
+          generic_sorter = require('telescope.sorters').get_generic_fuzzy_sorter,
+
+          -- プロンプトを上部に
+          layout_strategy = "horizontal",
           layout_config = {
             horizontal = {
+              prompt_position = "top",
               preview_width = 0.55,
               results_width = 0.8,
             },
@@ -171,15 +158,93 @@ local plugins = {
             },
             width = 0.87,
             height = 0.80,
-            preview_cutoff = 120,
+            preview_cutoff = 1,  -- Always show preview
           },
+
+          -- 色とアイコンの改善
+          borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+
+          mappings = {
+            i = {
+              ["<C-j>"] = actions.move_selection_next,
+              ["<C-k>"] = actions.move_selection_previous,
+              ["<C-n>"] = actions.cycle_history_next,
+              ["<C-p>"] = actions.cycle_history_prev,
+              ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+              ["<Esc>"] = actions.close,
+              ["<C-c>"] = actions.close,
+              -- プレビューのスクロール
+              ["<C-u>"] = actions.preview_scrolling_up,
+              ["<C-d>"] = actions.preview_scrolling_down,
+              -- 選択モード
+              ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+              ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+            },
+            n = {
+              ["<C-j>"] = actions.move_selection_next,
+              ["<C-k>"] = actions.move_selection_previous,
+              ["q"] = actions.close,
+              ["<Esc>"] = actions.close,
+              -- プレビューのスクロール
+              ["<C-u>"] = actions.preview_scrolling_up,
+              ["<C-d>"] = actions.preview_scrolling_down,
+              -- 選択モード
+              ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+              ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+            },
+          },
+
+          -- パフォーマンス改善
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--hidden",  -- 隠しファイルも検索
+            "--glob=!.git/",  -- .gitディレクトリは除外
+          },
+
+          file_ignore_patterns = {
+            "node_modules",
+            ".git/",
+            "%.lock",
+            "target/",
+            "build/",
+            "dist/",
+            "%.jpg",
+            "%.png",
+            "%.jpeg",
+            "%.gif",
+            "%.svg",
+            "%.ico",
+          },
+
+          -- 検索結果の表示改善
+          path_display = { "truncate" },  -- 長いパスを省略
+          set_env = { ["COLORTERM"] = "truecolor" },
         },
+
         pickers = {
           find_files = {
             hidden = true,
+            follow = true,  -- シンボリックリンクを追跡
+            find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
           },
           oldfiles = {
-            cwd_only = true,  -- Only show files in current working directory
+            cwd_only = true,
+            only_cwd = true,
+          },
+          live_grep = {
+            additional_args = function()
+              return { "--hidden", "--glob=!.git/" }
+            end,
+          },
+          buffers = {
+            sort_mru = true,  -- 最近使用順にソート
+            ignore_current_buffer = true,
           },
         },
       })

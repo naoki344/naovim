@@ -69,6 +69,31 @@ vim.keymap.set('n', '<C-o>', function()
   require('telescope.builtin').oldfiles({ cwd_only = true })
 end, { desc = 'Recent files (cwd) with Telescope' })
 
+-- Additional Telescope shortcuts
+vim.keymap.set('n', '<leader>/', function()
+  require('telescope.builtin').current_buffer_fuzzy_find()
+end, { desc = 'Fuzzy find in current buffer' })
+
+vim.keymap.set('n', '<leader>fw', function()
+  require('telescope.builtin').grep_string()
+end, { desc = 'Find word under cursor' })
+
+vim.keymap.set('n', '<leader>fk', function()
+  require('telescope.builtin').keymaps()
+end, { desc = 'Find keymaps' })
+
+vim.keymap.set('n', '<leader>ft', function()
+  require('telescope.builtin').colorscheme({ enable_preview = true })
+end, { desc = 'Color schemes' })
+
+vim.keymap.set('n', '<leader>fq', function()
+  require('telescope.builtin').quickfix()
+end, { desc = 'Quickfix list' })
+
+vim.keymap.set('n', '<leader>fj', function()
+  require('telescope.builtin').jumplist()
+end, { desc = 'Jump list' })
+
 -- LSP mappings (defined in lsp.lua on_attach function)
 -- gD - Go to declaration
 -- gd - Go to definition

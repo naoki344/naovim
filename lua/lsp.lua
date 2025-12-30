@@ -54,6 +54,11 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
   vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, bufopts)
 
+  -- Enable inlay hints for Go files
+  if client.name == "gopls" and client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
+
   -- Show diagnostics on cursor hold for TypeScript/JavaScript files
   if client.name == "ts_ls" then
     vim.api.nvim_create_autocmd("CursorHold", {
@@ -135,12 +140,61 @@ cmp.setup({
       end
     end,
   },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  formatting = {
+    fields = { 'kind', 'abbr', 'menu' },
+    format = function(entry, vim_item)
+      local kind_icons = {
+        Text = "󰉿",
+        Method = "󰆧",
+        Function = "󰊕",
+        Constructor = "",
+        Field = "󰜢",
+        Variable = "󰀫",
+        Class = "󰠱",
+        Interface = "",
+        Module = "",
+        Property = "󰜢",
+        Unit = "󰑭",
+        Value = "󰎠",
+        Enum = "",
+        Keyword = "󰌋",
+        Snippet = "",
+        Color = "󰏘",
+        File = "󰈙",
+        Reference = "󰈇",
+        Folder = "󰉋",
+        EnumMember = "",
+        Constant = "󰏿",
+        Struct = "󰙅",
+        Event = "",
+        Operator = "󰆕",
+        TypeParameter = "",
+      }
+      -- アイコンとテキストを設定
+      vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind] or '', vim_item.kind)
+      -- ソース名を表示
+      vim_item.menu = ({
+        nvim_lsp = '[LSP]',
+        luasnip = '[Snippet]',
+        buffer = '[Buffer]',
+        path = '[Path]',
+      })[entry.source.name]
+      return vim_item
+    end,
+  },
   mapping = cmp.mapping.preset.insert({
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<CR>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = false,  -- 選択されている場合のみ確定
+    }),
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -161,12 +215,14 @@ cmp.setup({
     end, { 'i', 's' }),
   }),
   sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-  }, {
-    { name = 'buffer' },
-    { name = 'path' },
-  })
+    { name = 'nvim_lsp', priority = 1000 },
+    { name = 'luasnip', priority = 750 },
+    { name = 'buffer', priority = 500 },
+    { name = 'path', priority = 250 },
+  }),
+  experimental = {
+    ghost_text = true,  -- プレビューテキストを表示
+  },
 })
 
 -- Setup completion for command line
@@ -234,9 +290,27 @@ setup_lsp_server('gopls', {
     gopls = {
       analyses = {
         unusedparams = true,
+        unusedwrite = true,
+        useany = true,
+        nilness = true,
+        shadow = true,
       },
       staticcheck = true,
       gofumpt = true,
+      completeUnimported = true,
+      usePlaceholders = true,
+      matcher = "Fuzzy",
+      symbolMatcher = "FastFuzzy",
+      experimentalPostfixCompletions = true,
+      hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        compositeLiteralTypes = true,
+        constantValues = true,
+        functionTypeParameters = true,
+        parameterNames = true,
+        rangeVariableTypes = true,
+      },
     },
   },
 })
