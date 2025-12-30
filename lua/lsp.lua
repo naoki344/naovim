@@ -67,6 +67,17 @@ local on_attach = function(client, bufnr)
         -- If only one result, jump directly
         if #unique_result == 1 then
           vim.cmd('normal! m\'')
+          -- Save current position for Ctrl+t before jumping
+          local current_buf = vim.api.nvim_get_current_buf()
+          local current_line = vim.fn.line('.')
+          local current_col = vim.fn.col('.')
+          local prev_jump = vim.g.lsp_jump_from
+          vim.g.lsp_jump_from = {
+            buf = current_buf,
+            line = current_line,
+            col = current_col,
+            prev = prev_jump
+          }
           vim.lsp.util.jump_to_location(unique_result[1], vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
           return
         end
@@ -79,10 +90,12 @@ local on_attach = function(client, bufnr)
         local current_buf = vim.api.nvim_get_current_buf()
         local current_line = vim.fn.line('.')
         local current_col = vim.fn.col('.')
+        local prev_jump = vim.g.lsp_jump_from
         vim.g.lsp_jump_from = {
           buf = current_buf,
           line = current_line,
-          col = current_col
+          col = current_col,
+          prev = prev_jump
         }
 
         vim.fn.setqflist(items)
@@ -159,11 +172,13 @@ end
 local lsp_ctrl_bracket_handler = function()
   local clients = vim.lsp.get_active_clients({ bufnr = 0 })
   if #clients > 0 then
-    -- Save current position for Ctrl+t
+    -- Save current position for Ctrl+t (keep history for multiple jumps)
+    local prev_jump = vim.g.lsp_jump_from
     vim.g.lsp_jump_from = {
       buf = vim.api.nvim_get_current_buf(),
       line = vim.fn.line('.'),
-      col = vim.fn.col('.')
+      col = vim.fn.col('.'),
+      prev = prev_jump
     }
 
     -- Get word under cursor for LSP definition request
@@ -224,12 +239,20 @@ end
 vim.keymap.set('n', '<C-]>', lsp_ctrl_bracket_handler, { noremap = true, silent = true })
 
 -- Global Ctrl+t to jump back to saved LSP jump position
+-- Supports multiple jump history
 vim.keymap.set('n', '<C-t>', function()
   if vim.g.lsp_jump_from then
     local jump_info = vim.g.lsp_jump_from
-    vim.api.nvim_set_current_buf(jump_info.buf)
-    vim.api.nvim_win_set_cursor(0, { jump_info.line, jump_info.col - 1 })
-    vim.g.lsp_jump_from = nil
+    -- Check if the buffer is still valid
+    if vim.api.nvim_buf_is_valid(jump_info.buf) then
+      vim.api.nvim_set_current_buf(jump_info.buf)
+      vim.api.nvim_win_set_cursor(0, { jump_info.line, jump_info.col - 1 })
+    else
+      -- If buffer is invalid, try to restore the previous jump
+      vim.notify("Saved buffer is no longer valid", vim.log.levels.WARN)
+    end
+    -- Restore previous jump position (history)
+    vim.g.lsp_jump_from = jump_info.prev
   else
     vim.notify("No LSP jump to go back to", vim.log.levels.WARN)
   end
