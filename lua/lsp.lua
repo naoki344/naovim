@@ -31,11 +31,87 @@ end
 local on_attach = function(client, bufnr)
   local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
+  -- Helper function to remove duplicate locations
+  local function remove_duplicates(locations)
+    if not locations or #locations == 0 then return locations end
+    local seen = {}
+    local unique = {}
+    for _, loc in ipairs(locations) do
+      local uri = loc.uri or loc.filename or ""
+      local key = string.format("%s:%d:%d", uri, (loc.range.start or loc.start or {}).line or 0, (loc.range.start or loc.start or {}).character or 0)
+      if not seen[key] then
+        seen[key] = true
+        table.insert(unique, loc)
+      end
+    end
+    return unique
+  end
+
+  -- Helper function to show Telescope picker with deduped results
+  local function show_telescope_deduped(method, picker_name)
+    return function()
+      local params = vim.lsp.util.make_position_params()
+      vim.lsp.buf_request(bufnr, method, params, function(err, result, ctx)
+        if err then
+          vim.notify(picker_name .. " not found", vim.log.levels.WARN)
+          return
+        end
+        if not result or #result == 0 then
+          vim.notify(picker_name .. " not found", vim.log.levels.INFO)
+          return
+        end
+
+        -- Remove duplicates
+        local unique_result = remove_duplicates(result)
+
+        -- If only one result, jump directly
+        if #unique_result == 1 then
+          vim.cmd('normal! m\'')
+          vim.lsp.util.jump_to_location(unique_result[1], vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+          return
+        end
+
+        -- Set quickfix list and open with Telescope
+        local client = vim.lsp.get_client_by_id(ctx.client_id)
+        local items = vim.lsp.util.locations_to_items(unique_result, client.offset_encoding)
+
+        -- Save current position to a global variable for tag stack management
+        local current_buf = vim.api.nvim_get_current_buf()
+        local current_line = vim.fn.line('.')
+        local current_col = vim.fn.col('.')
+        vim.g.lsp_jump_from = {
+          buf = current_buf,
+          line = current_line,
+          col = current_col
+        }
+
+        vim.fn.setqflist(items)
+
+        local ok_telescope, telescope = pcall(require, 'telescope.builtin')
+        if ok_telescope then
+          -- Clear any pending input and open Telescope with empty default text
+          vim.defer_fn(function()
+            -- Clear input buffer
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'n', true)
+            telescope.quickfix({ default_text = "" })
+          end, 1)
+        else
+          -- Fallback to location list if Telescope not available
+          vim.cmd('botright lopen')
+        end
+      end)
+    end
+  end
+
   -- LSP keymaps
   vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  vim.keymap.set('n', 'gd', show_telescope_deduped('textDocument/definition', 'Definition'), bufopts)
+  -- Note: Ctrl+] is defined as a global keymap below
+  vim.keymap.set('n', 'gi', show_telescope_deduped('textDocument/implementation', 'Implementation'), bufopts)
+  vim.keymap.set('n', '<C-[>', show_telescope_deduped('textDocument/implementation', 'Implementation'), bufopts)
+
+
   vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
   vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
   vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
   vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
@@ -45,7 +121,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+  vim.keymap.set('n', 'gr', show_telescope_deduped('textDocument/references', 'References'), bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 
   -- Diagnostic keymaps
@@ -77,6 +153,87 @@ local on_attach = function(client, bufnr)
     })
   end
 end
+
+-- Global Ctrl+] to jump to definition (with save for Ctrl+t)
+-- This is set globally to override the native tag behavior and provide consistent LSP navigation
+local lsp_ctrl_bracket_handler = function()
+  local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+  if #clients > 0 then
+    -- Save current position for Ctrl+t
+    vim.g.lsp_jump_from = {
+      buf = vim.api.nvim_get_current_buf(),
+      line = vim.fn.line('.'),
+      col = vim.fn.col('.')
+    }
+
+    -- Get word under cursor for LSP definition request
+    local bufnr = vim.api.nvim_get_current_buf()
+    local params = vim.lsp.util.make_position_params()
+
+    -- Request definition from LSP
+    vim.lsp.buf_request(bufnr, 'textDocument/definition', params, function(err, result, ctx)
+      if err then
+        vim.notify("Definition not found", vim.log.levels.WARN)
+        return
+      end
+      if not result or #result == 0 then
+        vim.notify("Definition not found", vim.log.levels.INFO)
+        return
+      end
+
+      -- Remove duplicates
+      local seen = {}
+      local unique = {}
+      for _, loc in ipairs(result) do
+        local uri = loc.uri or loc.filename or ""
+        local key = string.format("%s:%d:%d", uri, (loc.range.start or loc.start or {}).line or 0, (loc.range.start or loc.start or {}).character or 0)
+        if not seen[key] then
+          seen[key] = true
+          table.insert(unique, loc)
+        end
+      end
+
+      -- If only one result, jump directly
+      if #unique == 1 then
+        vim.cmd('normal! m\'')
+        vim.lsp.util.jump_to_location(unique[1], vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+        return
+      end
+
+      -- Show with Telescope quickfix
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
+      local items = vim.lsp.util.locations_to_items(unique, client.offset_encoding)
+      vim.fn.setqflist(items)
+
+      vim.defer_fn(function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'n', true)
+        local ok_telescope, telescope = pcall(require, 'telescope.builtin')
+        if ok_telescope then
+          telescope.quickfix({ default_text = "" })
+        else
+          vim.cmd('botright lopen')
+        end
+      end, 1)
+    end)
+  else
+    -- Use native tag command if no LSP client
+    vim.cmd('tag <cword>')
+  end
+end
+
+vim.keymap.set('n', '<C-]>', lsp_ctrl_bracket_handler, { noremap = true, silent = true })
+
+-- Global Ctrl+t to jump back to saved LSP jump position
+vim.keymap.set('n', '<C-t>', function()
+  if vim.g.lsp_jump_from then
+    local jump_info = vim.g.lsp_jump_from
+    vim.api.nvim_set_current_buf(jump_info.buf)
+    vim.api.nvim_win_set_cursor(0, { jump_info.line, jump_info.col - 1 })
+    vim.g.lsp_jump_from = nil
+  else
+    vim.notify("No LSP jump to go back to", vim.log.levels.WARN)
+  end
+end, { noremap = true, silent = true })
 
 -- Auto-format on save for TypeScript/JavaScript files using LSP
 vim.api.nvim_create_autocmd("BufWritePre", {

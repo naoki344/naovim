@@ -278,10 +278,6 @@ local plugins = {
   },
 
   -- Language specific
-  {
-    "fatih/vim-go",
-    ft = "go",
-  },
   "github/copilot.vim",
 
   -- React/JavaScript/TypeScript specific
